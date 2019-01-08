@@ -24,31 +24,31 @@ var QuantraSnippets = [
         'code': 'account.portfolio'
     },
     {
-        'name': '获取当前持仓的股票列表',
+        'name': '获取当前持仓的基金列表',
         'code': 'account.sec_pos[]'
     },
     {
-        'name': '获取当天所有股票的交易价格',
+        'name': '获取当天所有基金的交易价格',
         'code': 'account.price[]'
     },
     {
-        'name': '获取当天可交易的所有股票列表',
+        'name': '获取当天可交易的所有基金列表',
         'code': 'account.get_stocks()'
     },
     {
-        'name': '获取当天所有股票在一段时间内的历史数据',
+        'name': '获取当天所有基金在一段时间内的历史数据',
         'code': 'account.get_history(\'attr\', days)'
     },
     {
-        'name': '对某个股票发起买入或卖出交易',
+        'name': '对某个基金发起买入或卖出交易',
         'code': 'account.trade(stock, target)'
     },
     {
-        'name': '获取所选股票池内所有股票在所有日期上的数据',
+        'name': '获取所选基金池内所有基金在所有日期上的数据',
         'code': 'account.universe_data'
     },
     {
-        'name': '获取所选股票池内所有股票在当前日期上的数据',
+        'name': '获取所选基金池内所有基金在当前日期上的数据',
         'code': 'account.today_data'
     }
 ];

@@ -58,7 +58,7 @@ var app = {
         get: function (url, cb) {
             return $.ajax({
                 url: url,
-                timeout: 5000,
+                timeout: 10000,
                 dataType: 'json',
                 success: function (result, status, xhr) {
                     if (result.ok == false) {
@@ -75,7 +75,7 @@ var app = {
         post: function (url, data, cb) {
             return $.ajax({
                 url: url,
-                timeout: 5000,
+                timeout: 10000,
                 method: 'POST',
                 data: data,
                 dataType: 'json',

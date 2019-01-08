@@ -4,9 +4,9 @@
 <div id="view_stockpool" class="container-fluid">
     <div class="row">
         <div class="col-md-2 left">
-            <button class="btn btn-primary" v-if="selected.name" @click="selected = {}">显示所有股票</button>
+            <button class="btn btn-primary" v-if="selected.name" @click="selected = {}">显示所有基金</button>
             <accordion type="info">
-                <panel is-open header="基本版块">
+                <!-- <panel is-open header="基本版块">
                     <div class="list">
                         <div v-for="pool in pools.base" @click="selected = pool"
                              v-bind:class="{ act: (!selected.id && selected.name == pool.name) || (selected.id > 0 && selected.id == pool.id) }"
@@ -15,8 +15,8 @@
                             {{ pool.name }}
                         </div>
                     </div>
-                </panel>
-                <panel header="行业版块">
+                </panel> -->
+                <panel is-open header="分类版块">
                     <div class="list">
                         <div v-for="pool in pools.industries" @click="selected = pool"
                              v-bind:class="{ act: (!selected.id && selected.name == pool.name) || (selected.id > 0 && selected.id == pool.id) }"
@@ -26,10 +26,10 @@
                         </div>
                     </div>
                 </panel>
-                <panel is-open header="自选股票池">
+                <panel is-open header="自选基金池">
                     <div class="list">
                         <span v-if="pools.custom.length == 0">
-                            暂无自选股票池
+                            暂无自选基金池
                         </span>
                         <div v-for="pool in pools.custom" @click="selected = pool"
                              v-bind:class="{ act: selected.id == pool.id }" style="cursor: pointer;">
@@ -37,7 +37,7 @@
                             {{ pool.name }}
                         </div>
                         <button class="btn btn-success" v-on:click="addPoolClick">
-                            <i class="mdi mdi-plus"></i> 新增自选股票池
+                            <i class="mdi mdi-plus"></i> 新增自选基金池
                         </button>
                     </div>
                 </panel>
@@ -45,7 +45,7 @@
         </div>
         <div class="col-md-10">
             <div class="header">
-                <h1>股票行情 {{ selected.name ? '[' + selected.name + ']' : '' }}</h1>
+                <h1>基金行情 {{ selected.name ? '[' + selected.name + ']' : '' }}</h1>
                 <div v-if="selected.id" style="margin-right: 10px;">
                     <button class="btn btn-primary" v-on:click="modifyClick">
                         <i class="mdi mdi-pencil"></i> 修改
@@ -66,17 +66,11 @@
             <table class="table table-hover">
                 <thead>
                 <tr>
-                    <th>股票代码</th>
-                    <th>股票名称</th>
+                    <th>基金代码</th>
+                    <th>基金名称</th>
                     <th>涨幅</th>
-                    <th v-if="realtime == 0">今收</th>
-                    <th v-if="realtime == 1">现价</th>
-                    <th>交易量</th>
-                    <th>今开</th>
-                    <th>最高</th>
-                    <th>最低</th>
-                    <th>昨收</th>
-                    <th v-if="realtime == 1">换手率</th>
+                    <th>净值</th>
+                    <th v-if="realtime == 1">总计规模</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -87,12 +81,7 @@
                         <td>{{ stk[1] }}</td>
                         <td>{{ percent(stk[7]) }}</td>
                         <td>{{ stk[5] }}</td>
-                        <td>{{ stk[8] }}</td>
-                        <td>{{ stk[2] }}</td>
-                        <td>{{ stk[3] }}</td>
-                        <td>{{ stk[4] }}</td>
-                        <td>{{ stk[6] }}</td>
-                        <td v-if="realtime == 1">{{ percent(stk[9]) }}</td>
+                        <td v-if="realtime == 1">{{ stk[8] }}</td>
                     </tr>
                 </paginate>
                 </tbody>
@@ -102,7 +91,7 @@
         </div>
     </div>
     <modal title="确认" v-model="confirmDelete">
-        确定要删除这个股票池吗？
+        确定要删除这个基金池吗？
         <div slot="modal-footer" class="modal-footer">
             <button type="button" class="btn btn-danger" v-on:click="deleteConfirm">确定删除</button>
             <button type="button" class="btn btn-default" @click="confirmDelete = false">取消</button>
@@ -117,6 +106,7 @@
         Vue.component('panel', VueStrap.panel);
         Vue.component('button-group', VueStrap.buttonGroup);
         Vue.component('radio', VueStrap.radio);
+        var loading = false;
         var view_stockpool = new Vue({
             el: '#view_stockpool',
             data: {
@@ -141,7 +131,7 @@
                     this.confirmDelete = true;
                 },
                 deleteConfirm: function (e) {
-                    app.modals.showLoading('正在删除股票池');
+                    app.modals.showLoading('正在删除基金池');
                     app.requests.get('/api/trade/pool/delete?id=' + this.selected.id).always(function () {
                         app.modals.hideLoading();
                         app.views.load('stockpool', app.views.param);
@@ -152,6 +142,8 @@
                 },
 
                 loadStocks: function () {
+                    if (loading) return;
+                    loading = true;
                     view_stockpool.stocks = [];
                     app.requests.wsClose();
                     if (this.realtime == 0) {
@@ -162,21 +154,23 @@
                                 this.date = app.index.max_date;
                             }
                         }
-                        app.modals.showLoading('正在加载股票行情');
+                        app.modals.showLoading('正在加载基金行情');
                         app.requests.get('/api/stock/stock_list?date=' + this.date, function (result) {
                             stock_data = result;
                             view_stockpool.filterStocks();
                         }).always(function () {
                             app.modals.hideLoading();
+                            loading = false;
                         });
                     } else if (this.realtime == 1) {
-                        app.modals.showLoading('正在加载股票行情');
+                        app.modals.showLoading('正在加载基金行情');
                         app.requests.wsConnect('ws/realtime_list');
                         app.requests.ws.onmessage = function (msg) {
                             stock_data = JSON.parse(msg.data);
-                            console.log(stock_data);
+                            // console.log(stock_data);
                             view_stockpool.filterStocks();
                             app.modals.hideLoading();
+                            loading = false;
                         };
                     }
                 },
@@ -226,7 +220,7 @@
         });
         var stock_data = [];
 
-        app.modals.showLoading('正在加载股票池列表');
+        app.modals.showLoading('正在加载基金池列表');
         app.requests.get('/api/trade/pool/get', function (json) {
             view_stockpool.pools = json;
             if (app.views.param.pool) {

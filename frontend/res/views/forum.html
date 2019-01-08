@@ -46,7 +46,7 @@
                     {{ thread.content }}
                 </div>
                 <div class="tag" v-if="thread.tag != ''">
-                    该帖子中提到的股票：
+                    该帖子中提到的基金：
                     <a href="javascript:" v-on:click="tagClick">{{ thread.tag }}</a>
                 </div>
             </div>
@@ -74,7 +74,7 @@
             <bs-input type="textarea" v-model="new_t.content" placeholder="请输入内容"></bs-input>
             <div style="display: flex;">
                 <div style="flex: 1;">
-                    <typeahead v-if="selected <= 0" v-model="new_t.tag" :data="stock_list" placeholder="相关股票（可选）"
+                    <typeahead v-if="selected <= 0" v-model="new_t.tag" :data="stock_list" placeholder="相关基金（可选）"
                                :on-hit="stock_hit" style="width: 50%;"></typeahead>
                 </div>
                 <div style="margin-left: 10px;">

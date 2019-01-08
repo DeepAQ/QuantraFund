@@ -15,7 +15,7 @@
     </div>
     <div class="card">
         <div class="title">
-            <i class="mdi mdi-cash"></i> 股票价格
+            <i class="mdi mdi-cash"></i> 基金价格
         </div>
         <div class="prices">
             <div>
@@ -110,11 +110,11 @@
 
     <div class="card">
         <div class="title">
-            <i class="mdi mdi-timetable"></i> 股票走势预测
+            <i class="mdi mdi-timetable"></i> 基金走势预测
         </div>
         <div v-if="predict.done" class="prediction">
             <div>
-                Quantra 预测下一交易日该股票会
+                Quantra 预测下一交易日该基金会
                 <span class="red" v-if="predict.rate > 0">上涨</span>
                 <span v-if="predict.rate == 0">一动不动</span>
                 <span class="green" v-if="predict.rate < 0">下跌</span>
@@ -132,7 +132,7 @@
 
     <div class="card">
         <div class="title">
-            <i class="mdi mdi-newspaper"></i> 股票相关新闻
+            <i class="mdi mdi-newspaper"></i> 基金相关新闻
         </div>
         <div v-if="stock_news.length == 0">正在加载新闻 ...</div>
         <table v-else class="table table-striped table-hover">
@@ -377,7 +377,7 @@
                 },
                 loadStocks: function () {
                     if (app.modals.loadingCount > 0) return;
-                    app.modals.showLoading('正在加载股票数据');
+                    app.modals.showLoading('正在加载基金数据');
                     app.requests.wsClose();
                     if (this.realtime == 0) {
                         app.requests.get('/api/stock/stock?code=' + this.code, function (res) {
@@ -540,8 +540,8 @@
 
         view_stock.loadStocks();
         view_stock.loadPredict();
-        app.requests.get('/api/stock/news?code=' + view_stock.code, function (res) {
-            view_stock.stock_news = res;
-        });
+        // app.requests.get('/api/stock/news?code=' + view_stock.code, function (res) {
+        //     view_stock.stock_news = res;
+        // });
     });
 </script>

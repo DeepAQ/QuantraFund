@@ -26,9 +26,9 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-sm-2"><i class="mdi mdi-database mdi-18px"></i> 股票池选择</div>
+                <div class="col-sm-2"><i class="mdi mdi-database mdi-18px"></i> 基金池选择</div>
                 <div class="col-sm-10">
-                    <v-select v-model="pools" multiple placeholder="选择一个或多个股票池" search clear-button>
+                    <v-select v-model="pools" multiple placeholder="选择一个或多个基金池" search clear-button>
                         <v-option v-for="(pool, index) in pool_list" v-bind:value="index">{{ pool.name }}</v-option>
                     </v-select>
                 </div>
@@ -279,7 +279,7 @@
             });
         };
 
-        app.modals.showLoading('正在加载股票池');
+        app.modals.showLoading('正在加载基金池');
         app.requests.get('/api/trade/pool/get', function (res) {
             var list = [];
             for (var key in res['custom']) {
