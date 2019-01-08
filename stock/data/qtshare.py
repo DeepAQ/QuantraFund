@@ -26,8 +26,20 @@ def history_netease(code, date_start, date_end):
                        'low': '最低价', 'close': '收盘价', 'volume': '成交量'})
 
 
+def fund_history(code, date_start, date_end):
+    r = requests.get('http://stock.finance.sina.com.cn/fundInfo/api/openapi.php/CaihuiFundInfoService.getNav?symbol=' + ('%06d' % code)
+                     + '&datefrom=' + date_start.strftime('%Y-%m-%d') + '&dateto=' + date_end.strftime('%Y-%m-%d')
+                     + '&num=100000')
+    df = pandas.io.json.json_normalize(r.json()['result']['data']['data'])
+    df['code'] = code
+    df['fbrq'] = df['fbrq'].str.slice(0, 10)
+    return df_map(df, {'code': 'code', 'date': 'fbrq', 'open': 'jjjz', 'high': 'jjjz',
+                       'low': 'jjjz', 'close': 'jjjz', 'volume': 'ljjz'})
+
+
 def history(code, date_start, date_end):
-    return history_netease(code, date_start, date_end)
+    return fund_history(code, date_start, date_end)
+    # return history_netease(code, date_start, date_end)
 
 
 def today_list_netease():
@@ -51,8 +63,20 @@ def today_list_tushare():
                        'volume': 'volume', 'turn_over': 'turnoverratio'})
 
 
+def fund_today_list():
+    r = requests.get(
+        'http://quotes.money.163.com/fn/service/netvalue.php?query=STYPE:FDO&fields='
+        'PUBLISHDATE,SYMBOL,SNAME,NAV,PCHG,M12RETRUN,SLNAVG,LJFH,ZJZC&sort=SYMBOL&order=asc&count=10000',
+        timeout=10)
+    df = pandas.io.json.json_normalize(r.json()['list']).dropna()
+    return df_map(df, {'code': 'SYMBOL', 'name': 'SNAME', 'rate': 'PCHG', 'price': 'NAV',
+                       'open': 'NAV', 'high': 'NAV', 'low': 'NAV', 'yest_close': 'NAV',
+                       'volume': 'ZJZC', 'turn_over': 'LJFH'})
+
+
 def today_list():
-    return today_list_netease()
+    return fund_today_list()
+    # return today_list_netease()
     # return today_list_tushare()
 
 
@@ -89,4 +113,4 @@ def stock_news(code):
 
 
 if __name__ == '__main__':
-    print(history_netease(1, datetime(2017, 3, 31), datetime(2017, 6, 13)))
+    print(history(1, datetime(2018, 12, 1), datetime(2018, 12, 10)))
