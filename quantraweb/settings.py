@@ -80,8 +80,8 @@ DATABASES = {
         # The following settings are not used with sqlite3:
         'USER': 'quantra',
         'PASSWORD': 'Quantra_Mysql',
-        'HOST': 'dg.linghouyun.com',  # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-        'PORT': '18836',  # Set to empty string for default.
+        'HOST': '127.0.0.1',  # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+        'PORT': '',  # Set to empty string for default.
     }
 }
 
