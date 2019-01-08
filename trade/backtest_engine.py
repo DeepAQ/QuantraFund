@@ -82,6 +82,7 @@ class Account:
 
 
 def run(args, ws):
+    print('Starting backtest')
     # load args
     start_date = args['start_date']
     end_date = args['end_date']
@@ -89,9 +90,10 @@ def run(args, ws):
     frequency = int(args['frequency'])
     capital = 100000000
     if len(universe) == 0:
-        ws.send(json.dumps({'error': True, 'msg': '未选中任何股票，请重新选择'}))
+        ws.send(json.dumps({'error': True, 'msg': '未选中任何基金，请重新选择'}))
         return
     # load data
+    print('Loading stock data')
     global stock_data
     stock_data = StockData().get_info(date=end_date,
                                       date_start=get_date(start_date) - timedelta(days=90)).reset_index()

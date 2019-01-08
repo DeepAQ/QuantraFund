@@ -35,11 +35,7 @@ def updatePool(request):
 def readPool(request):
     stock_index = StockData().get_index()
     result = {
-        'base': [
-            {'name': '沪深300', 'stocks': stock_index[stock_index.index < 2000].index.values.tolist()},
-            {'name': '中小板', 'stocks': stock_index[(stock_index.index >= 2000) & (stock_index.index < 3000)].index.values.tolist()},
-            {'name': '创业板', 'stocks': stock_index[stock_index.index >= 300000].index.values.tolist()},
-        ],
+        'base': [],
         'industries': [{'name': row['name'], 'stocks': json.loads(row['stocks'])} for id, row in StockData().get_industries().iterrows()],
         'custom': []
     }
@@ -57,7 +53,7 @@ def getPoolById(request):
         if pool:
             return JsonResponse({'ok': True, 'name': pool[0].name, 'stocks': json.loads(pool[0].stock_list)})
         else:
-            return JsonResponse({'ok': False, 'msg': '股票池不存在'})
+            return JsonResponse({'ok': False, 'msg': '基金池不存在'})
     else:
         return JsonResponse({'ok': False, 'msg': '请登录后重试'})
 
@@ -74,6 +70,6 @@ def deletePoolById(request):
                 response['msg'] = '服务器异常'
             return JsonResponse(response)
         else:
-            return JsonResponse({'ok': False, 'msg': '股票池不存在'})
+            return JsonResponse({'ok': False, 'msg': '基金池不存在'})
     else:
         return JsonResponse({'ok': False, 'msg': '请登录后重试'})

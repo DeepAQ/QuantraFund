@@ -6,7 +6,7 @@ import time
 from datetime import datetime, timedelta
 
 import pandas
-import keras
+# import keras
 from stock.predict_util import lstm
 from django.http import HttpResponse, JsonResponse
 
@@ -48,7 +48,7 @@ def market(request):
         if len(info_yesterday) > 0:
             break
     if len(info_today) == 0 or len(info_yesterday) == 0:
-        return JsonResponse({'ok': False, 'msg': '当天无股票数据，请更换日期'})
+        return JsonResponse({'ok': False, 'msg': '当天无基金数据，请更换日期'})
 
     info_today['name'] = index['name']
     info_today['adjclose_last'] = info_yesterday['adjclose']
@@ -93,9 +93,14 @@ def market(request):
 
 def stock_list(request):
     date = datetime.strptime(request.GET['date'], '%Y-%m-%d').date()
-    info = StockData().get_info(date=date, date_start=date - timedelta(days=1))
-    info_today = info[info['date'] == date]
-    info_yesterday = info[info['date'] == date - timedelta(days=1)]
+    info = StockData().get_info(date=date, date_start=date - timedelta(days=14))
+    info_today = info[info['date'] == date].dropna()
+    for i in range(1, 14):
+        info_yesterday = info[info['date'] == date - timedelta(days=i)]
+        if len(info_yesterday) > 0:
+            break
+    if len(info_today) == 0 or len(info_yesterday) == 0:
+        return JsonResponse({'ok': False, 'msg': '当天无基金数据，请更换日期'})
     index = StockData().get_index()
 
     info_today.loc[:, 'name'] = index['name']
@@ -134,18 +139,19 @@ def stock_news(request):
 
 
 def stock_predict(request):
-    code = int(request.GET['code'])
-    info = StockData().get_info(code=code, limit=90).iloc[::-1]
-    data = list(info['close'])
+    return JsonResponse({})
+    # code = int(request.GET['code'])
+    # info = StockData().get_info(code=code, limit=90).iloc[::-1]
+    # data = list(info['close'])
 
-    keras.backend.clear_session()
-    model = keras.models.load_model('model.h5')
-    new_data = lstm.pure_deal_data(data, 30)
-    predict_list = lstm.pure_predict(model, new_data)
-    predict_rate = [((1 + predict_list[i]) * data[i] - data[i + 29]) / data[i + 29] for i in range(len(predict_list))]
-    real_rate = [(data[i + 30] - data[i + 29]) / data[i + 29] for i in range(len(predict_list) - 1)]
-    return JsonResponse({'tomorrow': predict_rate[-1], 'predict': predict_rate[:-1],
-                         'real': real_rate, 'dates': list(info[-60:]['date'])})
+    # keras.backend.clear_session()
+    # model = keras.models.load_model('model.h5')
+    # new_data = lstm.pure_deal_data(data, 30)
+    # predict_list = lstm.pure_predict(model, new_data)
+    # predict_rate = [((1 + predict_list[i]) * data[i] - data[i + 29]) / data[i + 29] for i in range(len(predict_list))]
+    # real_rate = [(data[i + 30] - data[i + 29]) / data[i + 29] for i in range(len(predict_list) - 1)]
+    # return JsonResponse({'tomorrow': predict_rate[-1], 'predict': predict_rate[:-1],
+    #                      'real': real_rate, 'dates': list(info[-60:]['date'])})
 
 
 @accept_websocket
@@ -160,11 +166,10 @@ def realtime_list(request):
             start = time.time()
             df = qtshare.today_list()
             for _, row in df.iterrows():
-                if row['volume'] > 0:
-                    result.append((row['code'], row['name'], row['open'], row['high'], row['low'], row['price'],
-                                   row['yest_close'], row['rate'], row['volume'], row['turn_over']))
+                result.append((row['code'], row['name'], row['open'], row['high'], row['low'], row['price'],
+                                row['yest_close'], row['rate'], row['volume'], row['turn_over']))
             request.websocket.send(json.dumps(result))
-            time.sleep(10)
+            time.sleep(60)
     else:
         return HttpResponse('This path accepts WebSocket connections.')
 
