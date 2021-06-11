@@ -36,7 +36,7 @@
 # users\tests.py: 4
 # users\urls.py: 1
 # users\views.py: 4,5
-Django == 1.11.2
+Django == 2.2.24
 
 # stock\views.py: 110
 Keras == 2.0.4
